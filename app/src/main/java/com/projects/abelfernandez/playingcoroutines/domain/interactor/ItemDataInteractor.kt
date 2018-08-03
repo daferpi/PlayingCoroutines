@@ -1,5 +1,6 @@
 package com.projects.abelfernandez.playingcoroutines.domain.interactor
 
+import com.projects.abelfernandez.playingcoroutines.asyncAwait
 import com.projects.abelfernandez.playingcoroutines.data.IItemDataRepository
 import com.projects.abelfernandez.playingcoroutines.data.Result
 import com.projects.abelfernandez.playingcoroutines.domain.entity.Item
@@ -20,7 +21,7 @@ class ItemDataInteractor(private val repository: IItemDataRepository) : IItemDat
 
     override fun findAllItems(func:(Result<List<Item>>) -> Unit) {
         launch(UI) {
-            val result = repository.findAllItems()
+            val result = asyncAwait { repository.findAllItems() }
             func(result)
         }
     }
