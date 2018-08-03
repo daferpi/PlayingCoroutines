@@ -1,23 +1,26 @@
 package com.projects.abelfernandez.playingcoroutines.presentation
-import com.projects.abelfernandez.playingcoroutines.domain.entity.Item
+import com.projects.abelfernandez.playingcoroutines.data.Result
 import com.projects.abelfernandez.playingcoroutines.domain.interactor.IItemDataInteractor
 
 
 interface IListDataPresenter {
-    companion object {
-        fun create():IListDataPresenter {
-            return ListDataPresenter(IItemDataInteractor.create())
+
+    fun findAllItems()
+}
+
+class ListDataPresenter(private val view: IListDataView, private val interactor:IItemDataInteractor):IListDataPresenter {
+
+
+    override fun findAllItems() {
+        interactor.findAllItems {
+            when (it) {
+                is Result.Success -> view.showListItems(it.data)
+                is Result.Error -> view.showError(it.exception)
+            }
         }
     }
 
-    fun findAllItems():List<Item>
-}
 
-class ListDataPresenter(private val interactor:IItemDataInteractor):IListDataPresenter {
-
-    override fun findAllItems(): List<Item> {
-        return interactor.findAllItems()
-    }
 
 
 }

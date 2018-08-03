@@ -10,31 +10,32 @@ interface IItemDataRepository {
         }
     }
 
-    fun findAllItems():List<Item>
+    suspend fun findAllItems():Result<List<Item>>
 }
 
 class ItemDataRepository(private val api: GithubApi = GithubApi.create()):IItemDataRepository {
 
 
-    override fun findAllItems(): List<Item> {
+    override suspend fun findAllItems(): Result<List<Item>> {
 
-        var itemsList = listOf<Item>()
-        launch {
-            try {
+        var itemsListResult = Result.Success(listOf<Item>())
+        try {
 
-                val response = api.findAllRepositories().await()
+            val response = api.findAllRepositories().await()
 
-                if (response.isSuccessful) {
-                    if (response.body() != null) {
-                        itemsList = response.body()!!
-                    }
+            if (response.isSuccessful) {
+                if (response.body() != null) {
+                    itemsListResult = Result.Success(response.body()!!)
                 }
-            } catch (exception:Exception) {
-                System.out.println(exception.localizedMessage)
+            } else {
+                Result.Error(Exception())
             }
+        } catch (exception:Exception) {
+            System.out.println(exception.localizedMessage)
+            Result.Error(Exception())
         }
 
-        return itemsList
+        return itemsListResult
 
     }
 
